@@ -1,34 +1,27 @@
 import { expect } from '@playwright/test';
 import { createBdd } from 'playwright-bdd';
+import {test} from "../fixture/fixtures";
 
-/**
- * this.my_account_Btn = page.getByRole('button', { name: 'My account' });
-    this.email_box = page.getByPlaceholder('E-Mail Address');
-    this.password_box = page.getByPlaceholder('Password');
-    this.submit_btn = page.locator("input[value='Login']");
- */
+const { Given, When, Then } = createBdd(test);
 
-const { Given, When, Then } = createBdd();
-
-Given('I navigate to {string}', async ({page}, url) => {
-  await page.goto(url);
-  await page.pause();
+Given('I navigate to {string}', async ({logInPage}, url) => {
+  await logInPage.navigateToURL(url);
 });
 
-Given('I click on My account', async ({page}) => {
-  await page.getByRole('button', { name: 'My account' }).click();
+Given('I click on My account', async ({logInPage}) => {
+  await logInPage.clickMYAccount();
 });
 
-Given('I enter E-Mail Address {string}', async ({page}, emailAddress) => {
-  await page.getByPlaceholder('E-Mail Address').fill(emailAddress);
+Given('I enter E-Mail Address {string}', async ({logInPage}, emailAddress) => {
+  await logInPage.enterEmailAddress(emailAddress);
 });
 
-Given('I enter password {string}', async ({page}, password) => {
-  await page.getByPlaceholder('Password').fill(password);
+Given('I enter password {string}', async ({logInPage}, password) => {
+  await logInPage.enterPassword(password);
 });
 
-When('I click on submit button', async ({page}) => {
- await page.locator("input[value='Login']").click();
+When('I click on submit button', async ({logInPage}) => {
+  await logInPage.submitForm();
 });
 
 Then('I should verify url contains {string}', async ({page}, looged_URL) => {

@@ -15,7 +15,7 @@ Feature: Verify login
      When I click on submit button
 	 Then I should verify url contains "route=account/account"
 
-	Scenario Outline: Verify user is not able login with following credentails 
+	Scenario Outline: Verify user is not able login with following "<emailaddress>" & "<password>" 
 	 And I click on My account
 	 And I enter E-Mail Address "<emailaddress>"
 	 And I enter password "<password>"
