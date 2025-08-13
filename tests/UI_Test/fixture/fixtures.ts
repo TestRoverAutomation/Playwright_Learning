@@ -1,14 +1,14 @@
 import { test as base, createBdd } from "playwright-bdd";
-import { LoginPage } from "../page/loginPage";
+import * as Pages from "../page/index";
 
 
 type Myfixtures ={
-    logInPage: LoginPage;
+    logInPage: Pages.LoginPage;
 }
 
 export const test = base.extend<Myfixtures>({
     logInPage: async({page}, use)=>{
-        const loginObj = new LoginPage(page);
+        const loginObj = new Pages.LoginPage(page);
         await use(loginObj);
     }
 })
