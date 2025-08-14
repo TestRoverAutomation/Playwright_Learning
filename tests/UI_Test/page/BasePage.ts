@@ -1,10 +1,9 @@
-import { Page } from "@playwright/test";
+import { Page } from '@playwright/test';
 
+export class BasePage {
+  protected page: Page;
 
-export class BasePage{
-    protected page: Page;
-
-    constructor(page:Page){
-        this.page=page;
-    }
+  constructor(page: Page) {
+    this.page = page;
+  }
 }
