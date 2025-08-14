@@ -1,5 +1,3 @@
 {
-    "cucumberautocomplete.steps": [
-        "tests/UI_Test/steps/**.steps.ts"
-    ]
+  "cucumberautocomplete.steps": ["tests/UI_Test/steps/**.steps.ts"]
 }

@@ -1,11 +1,10 @@
-import { test as base, createBdd } from "playwright-bdd";
-import * as Pages from "../page/index";
-import { Page } from "@playwright/test";
+import { test as base, createBdd } from 'playwright-bdd';
+import * as Pages from '../page/index';
+import { Page } from '@playwright/test';
 
-
-type Myfixtures ={
-    logInPage: Pages.LoginPage;
-}
+type Myfixtures = {
+  logInPage: Pages.LoginPage;
+};
 
 /**
  * 1st:-
@@ -65,13 +64,14 @@ use(...) → Sends that actor straight into your test code.
 
  */
 
-const createTestFunction = <T extends new (page: Page) => InstanceType<T>>(PageClass: T) =>
-    ({ page }: { page: Page }, use: (fixture: InstanceType<T>) => Promise<void>) =>
-        use(new PageClass(page));
-
-
+const createTestFunction =
+  <T extends new (page: Page) => InstanceType<T>>(PageClass: T) =>
+  (
+    { page }: { page: Page },
+    use: (fixture: InstanceType<T>) => Promise<void>
+  ) =>
+    use(new PageClass(page));
 
 export const test = base.extend<Myfixtures>({
-    logInPage: createTestFunction(Pages.LoginPage)
-})
-
+  logInPage: createTestFunction(Pages.LoginPage),
+});

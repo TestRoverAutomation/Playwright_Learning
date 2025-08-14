@@ -1,30 +1,30 @@
 @login
 Feature: Verify login
+  Feature Description
 
-    Feature Description
+  Verify user is able to login with valid and invalid credentials
 
-	Verify user is able to login with valid and invalid credentials
+  Background: Navigate to eco login page
+    Given I navigate to "https://ecommerce-playground.lambdatest.io/"
 
-    Background: Navigate to eco login page
-	Given I navigate to "https://ecommerce-playground.lambdatest.io/"
+  Scenario: Verify user is able to login with valid credentials
+    And I click on My account
+    And I enter E-Mail Address "pranav@testroverautomation.com"
+    And I enter password "Test1234"
+    When I click on submit button
+    Then I should verify url contains "route=account/account"
 
-	Scenario: Verify user is able to login with valid credentials
-	 And I click on My account
-	 And I enter E-Mail Address "pranav@testroverautomation.com"
-	 And I enter password "Test1234"
-     When I click on submit button
-	 Then I should verify url contains "route=account/account"
+  Scenario Outline: Verify user is not able login with following "<emailaddress>" & "<password>"
+    And I click on My account
+    And I enter E-Mail Address "<emailaddress>"
+    And I enter password "<password>"
+    When I click on submit button
+    Then I should verify user is not able to login and url contains "route=account/login"
 
-	Scenario Outline: Verify user is not able login with following "<emailaddress>" & "<password>" 
-	 And I click on My account
-	 And I enter E-Mail Address "<emailaddress>"
-	 And I enter password "<password>"
-     When I click on submit button
-	 Then I should verify user is not able to login and url contains "route=account/login"
-	Examples:
-		| emailaddress		| password 	 	| 
-		| xzy@gmail.com 	  |	 TesMeTest     |
-		| srk@testroverautomation.com | Jawan123 |
-		| testerrgreat@123.com | Tesrxzy123 |
-		| srk_jawan@test.com | great123 |
-		| SalmanDabang@gmail.com | test 123 |
+    Examples:
+      | emailaddress                | password   |
+      | xzy@gmail.com               | TesMeTest  |
+      | srk@testroverautomation.com | Jawan123   |
+      | testerrgreat@123.com        | Tesrxzy123 |
+      | srk_jawan@test.com          | great123   |
+      | SalmanDabang@gmail.com      | test 123   |
