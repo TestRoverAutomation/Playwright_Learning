@@ -7,7 +7,7 @@
     "lint:feature": "node lint-features.js",
     "lint": "npm run lint:ts && npm run lint:feature",
     "lint:fix": "eslint \"tests/**/*.{ts,js}\" --fix",
-     "prepare": "husky install",
+    "prepare": "husky",
     "format": "prettier --check .",
     "format:fix": "prettier --write ."
   },
@@ -28,6 +28,7 @@
     "globals": "^16.4.0",
     "husky": "^9.1.7",
     "jiti": "^2.6.0",
+    "lint-staged": "^15.5.2",
     "playwright-bdd": "^8.3.1",
     "prettier": "^3.6.2",
     "prettier-plugin-gherkin": "^3.1.2",
