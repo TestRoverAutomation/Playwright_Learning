@@ -1,4 +1,4 @@
-@login
+@test
 Feature: Verify login
   Feature Description
 
