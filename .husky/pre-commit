@@ -1,5 +1,4 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
 
-echo "🔍 Running lint and prettier before commit..."
-npm run lint && npm run format
+echo "🔍 Running lint-staged on staged files..."
+npx lint-staged
