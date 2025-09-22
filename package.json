@@ -6,7 +6,10 @@
     "lint:ts": "eslint \"tests/**/*.{ts,js}\"",
     "lint:feature": "node lint-features.js",
     "lint": "npm run lint:ts && npm run lint:feature",
-    "lint:fix": "eslint \"tests/**/*.{ts,js}\" --fix"
+    "lint:fix": "eslint \"tests/**/*.{ts,js}\" --fix",
+     "prepare": "husky install",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "keywords": [],
   "author": "",
