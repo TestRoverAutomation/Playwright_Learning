@@ -1,4 +1,4 @@
-import { test as base, createBdd } from 'playwright-bdd';
+import { test as base } from 'playwright-bdd';
 import * as Pages from '../page/index';
 import { Page } from '@playwright/test';
 

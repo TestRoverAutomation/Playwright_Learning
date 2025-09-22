@@ -2,16 +2,32 @@
   "name": "playwright_learning",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "lint:ts": "eslint \"tests/**/*.{ts,js}\"",
+    "lint:feature": "node lint-features.js",
+    "lint": "npm run lint:ts && npm run lint:feature",
+    "lint:fix": "eslint \"tests/**/*.{ts,js}\" --fix"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@eslint/json": "^0.13.2",
     "@playwright/test": "^1.54.1",
     "@types/node": "^24.0.13",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
+    "@typescript-eslint/parser": "^8.44.0",
+    "eslint": "^9.36.0",
+    "eslint-plugin-playwright": "^2.2.2",
+    "gherkin-lint": "^4.2.4",
+    "globals": "^16.4.0",
+    "husky": "^9.1.7",
+    "jiti": "^2.6.0",
     "playwright-bdd": "^8.3.1",
     "prettier": "^3.6.2",
-    "prettier-plugin-gherkin": "^3.1.2"
+    "prettier-plugin-gherkin": "^3.1.2",
+    "typescript-eslint": "^8.44.0"
   }
 }
