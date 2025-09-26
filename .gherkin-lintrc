@@ -1,0 +1,3 @@
+{
+  "no-restricted-tags": ["on", {"tags": [ "@test", "@watch", "@wip"], "patterns": ["^@todo$","^@test$"]}]
+}
