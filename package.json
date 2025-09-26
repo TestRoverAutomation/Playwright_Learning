@@ -16,10 +16,6 @@
       "eslint --fix tests/**/*.ts",
       "prettier --write tests/**/*.ts"
     ],
-    "*.js": [
-      "eslint --fix tests/**/*.js",
-      "prettier --write tests/**/*.js"
-    ],
     "*.feature": [
       "node lint-features.js",
       "prettier --write"
@@ -35,10 +31,11 @@
   "devDependencies": {
     "@eslint/js": "^9.36.0",
     "@eslint/json": "^0.13.2",
-    "@playwright/test": "^1.54.1",
+    "@playwright/test": "^1.55.1",
     "@types/node": "^24.0.13",
     "@typescript-eslint/eslint-plugin": "^8.44.0",
     "@typescript-eslint/parser": "^8.44.0",
+    "allure-playwright": "^3.4.1",
     "eslint": "^9.36.0",
     "eslint-plugin-playwright": "^2.2.2",
     "gherkin-lint": "^4.2.4",
