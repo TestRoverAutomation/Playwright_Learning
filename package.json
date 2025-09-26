@@ -13,12 +13,12 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --fix tests/**/*.ts",
+      "prettier --write tests/**/*.ts"
     ],
     "*.js": [
-      "eslint --fix",
-      "prettier --write"
+      "eslint --fix tests/**/*.js",
+      "prettier --write tests/**/*.js"
     ],
     "*.feature": [
       "node lint-features.js",
