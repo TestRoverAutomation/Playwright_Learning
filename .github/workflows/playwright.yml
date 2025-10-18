@@ -19,11 +19,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
@@ -32,10 +41,17 @@ jobs:
       - name: Install Java (required for Allure)
         run: sudo apt-get update && sudo apt-get install -y openjdk-11-jre
 
+      - name: Install Allure CLI globally
+        run: |
+          npm install -g allure-commandline
+          echo "$(npm root -g)/.bin" >> $GITHUB_PATH
+          echo "/usr/local/bin" >> $GITHUB_PATH
+          allure --version
+
       - name: Generate Allure report
         if: success() || failure()
         run: |
-          npm run allure-report
+          allure generate allure-results --clean -o allure-report
 
       - name: Upload Allure report as artifact
         if: always()
@@ -46,7 +62,7 @@ jobs:
           retention-days: 30
 
       - name: Deploy Allure report to Netlify
-        # if: success() # only if all tests passed
+        if: success()
         run: |
           npx netlify deploy \
             --site ${{ secrets.NETLIFY_SITE_ID }} \
