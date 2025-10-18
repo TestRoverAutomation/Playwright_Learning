@@ -8,6 +8,7 @@ Given('I navigate to {string}', async ({ logInPage }, url) => {
   await logInPage.navigateToURL(url);
   console.log('My first report for Netlify is depoloyed');
   console.log('My first report  is depoloyed');
+  console.log('This is run on Playwright Docker image');
 });
 
 Given('I click on My account', async ({ logInPage }) => {

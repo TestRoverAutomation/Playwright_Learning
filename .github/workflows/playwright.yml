@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: mcr.microsoft.com/playwright:v1.56.1-noble
     timeout-minutes: 60
 
     steps:
