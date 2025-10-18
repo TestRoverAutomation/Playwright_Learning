@@ -6,6 +6,7 @@ const { Given, When, Then } = createBdd(test);
 
 Given('I navigate to {string}', async ({ logInPage }, url) => {
   await logInPage.navigateToURL(url);
+  console.log('My first report for Netlify is depoloyed');
 });
 
 Given('I click on My account', async ({ logInPage }) => {

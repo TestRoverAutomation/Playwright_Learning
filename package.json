@@ -9,7 +9,9 @@
     "lint:fix": "eslint \"tests/**/*.{ts,js}\" --fix",
     "prepare": "husky",
     "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:fix": "prettier --write .",
+    "test": "npx bddgen && npx playwright test",
+    "allure-report": "allure generate allure-results --clean -o allure-report && allure open allure-report"
   },
   "lint-staged": {
     "*.ts": [
@@ -47,5 +49,8 @@
     "prettier": "^3.6.2",
     "prettier-plugin-gherkin": "^3.1.2",
     "typescript-eslint": "^8.44.0"
+  },
+  "dependencies": {
+    "netlify-cli": "^23.9.1"
   }
 }
