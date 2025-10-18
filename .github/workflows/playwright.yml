@@ -32,7 +32,7 @@ jobs:
       - name: Generate Allure report
         if: success() || failure()
         run: |
-          npx allure generate allure-results --clean -o allure-report
+          npm run allure-report
 
       - name: Upload Allure report as artifact
         if: always()
