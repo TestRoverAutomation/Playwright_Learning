@@ -29,6 +29,9 @@ jobs:
       - name: Run Playwright tests
         run: npm run test
 
+      - name: Install Java (required for Allure)
+        run: sudo apt-get update && sudo apt-get install -y openjdk-11-jre
+
       - name: Generate Allure report
         if: success() || failure()
         run: |
