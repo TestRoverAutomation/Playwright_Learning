@@ -5,6 +5,8 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  schedule:
+    - cron: '0 4 * * *' # Daily run at 04:00 AM UTC
 
 jobs:
   test:
@@ -17,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node (cache npm)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
@@ -33,7 +35,9 @@ jobs:
         run: npm run test
 
       - name: Install Java (for Allure)
-        run: apt-get update && apt-get install -y openjdk-11-jre
+        run: |
+          apt-get update
+          apt-get install -y openjdk-11-jre
 
       - name: Install Allure CLI globally
         run: |
@@ -45,20 +49,44 @@ jobs:
         if: success() || failure()
         run: allure generate allure-results --clean -o allure-report
 
+      # ✅ Step to sanitize branch name once and reuse everywhere
+      - name: Sanitize branch name
+        id: sanitize
+        run: |
+          RAW_BRANCH="${{ github.head_ref || github.ref_name }}"
+          SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '/: ' '-' | tr -cd '[:alnum:]-_.')
+          echo "Sanitized branch name: $SAFE_BRANCH"
+          echo "safe_branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
+
+      # ✅ Upload Allure report artifact
       - name: Upload Allure report as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report
+          name: allure-report-${{ steps.sanitize.outputs.safe_branch }}
           path: allure-report/
           retention-days: 30
 
+      # ✅ Deploy Allure report (prod for main/master, preview for branches)
       - name: Deploy Allure report to Netlify
         if: success()
-        run: |
-          npx netlify deploy \
-            --site ${{ secrets.NETLIFY_SITE_ID }} \
-            --prod \
-            --dir allure-report
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          SAFE_BRANCH="${{ steps.sanitize.outputs.safe_branch }}"
+          echo "Deploying for branch: $SAFE_BRANCH"
+
+          if [ "$SAFE_BRANCH" = "main" ] || [ "$SAFE_BRANCH" = "master" ]; then
+            echo "🚀 Deploying production report for $SAFE_BRANCH ..."
+            npx netlify deploy \
+              --site "$SITE_ID" \
+              --prod \
+              --dir allure-report
+          else
+            echo "🧪 Deploying preview report for branch: $SAFE_BRANCH ..."
+            npx netlify deploy \
+              --site "$SITE_ID" \
+              --alias "$SAFE_BRANCH" \
+              --dir allure-report
+          fi
