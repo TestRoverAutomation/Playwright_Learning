@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main, master]
 
-  # Daily scheduled main branch run (04:00 AM UTC)
+  # ✅ Scheduled main run every day at 04:00 AM UTC
   schedule:
     - cron: '0 4 * * *'
 
@@ -51,6 +51,7 @@ jobs:
         if: success() || failure()
         run: allure generate allure-results --clean -o allure-report
 
+      # ✅ Upload Allure report as artifact (safe name)
       - name: Upload Allure report as artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -59,22 +60,25 @@ jobs:
           path: allure-report/
           retention-days: 30
 
-      #  Conditional Netlify deploy
+      # ✅ Deploy Allure report to Netlify (prod for main / preview for branches)
       - name: Deploy Allure report to Netlify
         if: success()
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+          # Sanitize branch name (replace / with -)
+          BRANCH_NAME=$(echo "${{ github.head_ref || github.ref_name }}" | tr '/' '-')
+
           if [ "$BRANCH_NAME" == "main" ] || [ "$BRANCH_NAME" == "master" ]; then
-            echo "Deploying main/master report to production..."
+            echo "🚀 Deploying production report for $BRANCH_NAME ..."
             npx netlify deploy \
-              --site ${{ secrets.NETLIFY_SITE_ID }} \
+              --site "$SITE_ID" \
               --prod \
               --dir allure-report
           else
-            echo "Deploying branch preview report for $BRANCH_NAME ..."
+            echo "🧪 Deploying preview report for branch: $BRANCH_NAME ..."
             npx netlify deploy \
-              --site ${{ secrets.NETLIFY_SITE_ID }} \
+              --site "$SITE_ID" \
               --alias "$BRANCH_NAME" \
               --dir allure-report
