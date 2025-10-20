@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, master]
 
+  # Daily scheduled main branch run (04:00 AM UTC)
+  schedule:
+    - cron: '0 4 * * *'
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,7 +21,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node (cache npm)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
@@ -33,7 +37,9 @@ jobs:
         run: npm run test
 
       - name: Install Java (for Allure)
-        run: apt-get update && apt-get install -y openjdk-11-jre
+        run: |
+          apt-get update
+          apt-get install -y openjdk-11-jre
 
       - name: Install Allure CLI globally
         run: |
@@ -49,16 +55,26 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report
+          name: allure-report-${{ github.head_ref || github.ref_name }}
           path: allure-report/
           retention-days: 30
 
+      #  Conditional Netlify deploy
       - name: Deploy Allure report to Netlify
         if: success()
-        run: |
-          npx netlify deploy \
-            --site ${{ secrets.NETLIFY_SITE_ID }} \
-            --prod \
-            --dir allure-report
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+          if [ "$BRANCH_NAME" == "main" ] || [ "$BRANCH_NAME" == "master" ]; then
+            echo "Deploying main/master report to production..."
+            npx netlify deploy \
+              --site ${{ secrets.NETLIFY_SITE_ID }} \
+              --prod \
+              --dir allure-report
+          else
+            echo "Deploying branch preview report for $BRANCH_NAME ..."
+            npx netlify deploy \
+              --site ${{ secrets.NETLIFY_SITE_ID }} \
+              --alias "$BRANCH_NAME" \
+              --dir allure-report
