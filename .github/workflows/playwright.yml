@@ -49,12 +49,19 @@ jobs:
         if: success() || failure()
         run: allure generate allure-results --clean -o allure-report
 
-      # ✅ Safe artifact upload (slashes replaced at YAML level)
+      # ✅ Safe artifact upload (sanitized branch name via step output)
+      - name: Sanitize branch name
+        id: sanitize
+        run: |
+          RAW_BRANCH="${{ github.head_ref || github.ref_name }}"
+          SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '/: ' '-' | tr -cd '[:alnum:]-_.')
+          echo "safe_branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
+
       - name: Upload Allure report as artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report-${{ replace(github.head_ref || github.ref_name, '/', '-') }}
+          name: allure-report-${{ steps.sanitize.outputs.safe_branch }}
           path: allure-report/
           retention-days: 30
 
