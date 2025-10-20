@@ -5,10 +5,8 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-
-  # ✅ Scheduled main run every day at 04:00 AM UTC
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '0 4 * * *'  # Daily run at 04:00 AM UTC
 
 jobs:
   test:
@@ -51,7 +49,7 @@ jobs:
         if: success() || failure()
         run: allure generate allure-results --clean -o allure-report
 
-      # ✅ Upload Allure report as artifact (safe name)
+      #  Safe artifact upload (slashes replaced with dashes)
       - name: Upload Allure report as artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -60,25 +58,36 @@ jobs:
           path: allure-report/
           retention-days: 30
 
-      # ✅ Deploy Allure report to Netlify (prod for main / preview for branches)
+      #  Deploy Allure report to Netlify (production or branch preview)
       - name: Deploy Allure report to Netlify
         if: success()
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          # Sanitize branch name (replace / with -)
-          BRANCH_NAME=$(echo "${{ github.head_ref || github.ref_name }}" | tr '/' '-')
+          # --- Sanitize branch name (replace slashes etc) ---
+          RAW_BRANCH="${{ github.head_ref || github.ref_name }}"
+          SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '/: ' '-' | tr -cd '[:alnum:]-_.')
+          echo "Sanitized branch name: $SAFE_BRANCH"
 
-          if [ "$BRANCH_NAME" == "main" ] || [ "$BRANCH_NAME" == "master" ]; then
-            echo "🚀 Deploying production report for $BRANCH_NAME ..."
+          if [ "$SAFE_BRANCH" = "main" ] || [ "$SAFE_BRANCH" = "master" ]; then
+            echo "🚀 Deploying production report for $SAFE_BRANCH ..."
             npx netlify deploy \
               --site "$SITE_ID" \
               --prod \
               --dir allure-report
           else
-            echo "🧪 Deploying preview report for branch: $BRANCH_NAME ..."
+            echo "🧪 Deploying preview report for branch: $SAFE_BRANCH ..."
             npx netlify deploy \
               --site "$SITE_ID" \
-              --alias "$BRANCH_NAME" \
+              --alias "$SAFE_BRANCH" \
               --dir allure-report
+
+      # ✅ Upload artifact with sanitized name
+      - name: Upload sanitized artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ github.head_ref || github.ref_name }}-safe
+          path: allure-report/
+          retention-days: 30
