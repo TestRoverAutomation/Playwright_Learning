@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    /* === Core Language & Module Settings === */
+    "target": "ES2020",
+    "module": "CommonJS",
+    "lib": ["ES2020", "DOM"],
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* === Strictness & Safety === */
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+
+    /* === Output & Paths === */
+    "outDir": "dist",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@utils/*": ["tests/UI_Test/utils/*"],
+      "@steps/*": ["tests/UI_Test/steps/*"],
+      "@fixtures/*": ["tests/UI_Test/fixture/*"]
+    },
+
+    /* === Types === */
+    "types": ["node"],
+    "typeRoots": ["./types", "./node_modules/@types"],
+
+    /* === Experimental === */
+    "experimentalDecorators": true
+  },
+  "include": ["tests/**/*.ts", "playwright.config.ts", "types/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "reports"]
+}
