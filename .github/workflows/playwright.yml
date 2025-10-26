@@ -91,12 +91,13 @@ jobs:
               --dir allure-report
           fi
            # ✅ Generate Cucumber HTML report  
-      -   name: Deploy Cucumber HTML report to GitHub Pages
-          if: success()
-          uses: peaceiris/actions-gh-pages@v4
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./cucumber-html-report
-            destination_dir: cucumber-reports/${{ steps.sanitize.outputs.safe_branch }}
+      - name: Deploy Cucumber HTML report to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./cucumber-html-report
+          destination_dir: cucumber-reports/${{ steps.sanitize.outputs.safe_branch }}
+
     
     
