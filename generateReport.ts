@@ -1,4 +1,4 @@
-import report from 'multiple-cucumber-html-reporter';
+const report = require('cucumber-html-reporter');
 import os from 'os';
 import { execSync } from 'child_process';
 import fs from 'fs';

@@ -20,6 +20,14 @@ export default defineConfig([
       playwright.configs['flat/recommended'], // ✅ flat config, not "plugin:..."
     ],
     rules: {
+        // ✅ allow CommonJS require() statements
+      '@typescript-eslint/no-var-requires': 'off',
+      // ✅ allow mixing import/require (useful for report.js)
+      '@typescript-eslint/no-require-imports': 'off',
+      'import/no-commonjs': 'off',
+
+      // Allow top-level await in flat configs or test utilities
+      'no-await-in-loop': 'off',
       // allow stand-alone expect() in steps
       'playwright/no-standalone-expect': 'off',
       // ❌ forbid page.pause()
@@ -40,5 +48,6 @@ export default defineConfig([
     plugins: { json },
     language: 'json/json',
     extends: ['json/recommended'],
+    ignores: ['**/node_modules/**'],
   },
 ]);
