@@ -2,9 +2,11 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [main, master]
+    branches: 
+      - '*'
   pull_request:
-    branches: [main, master]
+    branches: 
+      - '*'
   # schedule:
   #   - cron: '0 4 * * *' # Daily run at 04:00 AM UTC
 
