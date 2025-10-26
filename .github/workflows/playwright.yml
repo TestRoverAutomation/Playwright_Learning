@@ -1,18 +1,25 @@
 name: Playwright Tests
 
+# 🧩 Trigger only for pull requests (no push runs)
 on:
-  push:
-    branches-ignore:
-      - 'dependabot/**'
-      - 'docs/**'
   pull_request:
     branches:
       - '**'
-  # schedule:
-  #   - cron: '0 4 * * *' # Daily run at 04:00 AM UTC
+
+# 🛡️ Permissions for GitHub Pages deploys + optional PR comments
+permissions:
+  contents: write          # required to push to gh-pages
+  pull-requests: write     # required to post PR comment URLs
+
+# 🚦 Prevent multiple concurrent runs on same branch
+concurrency:
+  group: playwright-tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
+    # ✅ Prevent duplicate push runs (safeguard)
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.56.1-noble
@@ -88,13 +95,8 @@ jobs:
           SAFE_BRANCH="${{ steps.sanitize.outputs.safe_branch }}"
           echo "Deploying Allure for branch: $SAFE_BRANCH"
 
-          if [ "$SAFE_BRANCH" = "main" ] || [ "$SAFE_BRANCH" = "master" ]; then
-            echo "🚀 Deploying production Allure report for $SAFE_BRANCH ..."
-            DEPLOY_URL=$(npx netlify deploy --site "$SITE_ID" --prod --dir allure-report | grep -o 'https://[^ ]*')
-          else
-            echo "🧪 Deploying preview Allure report for branch: $SAFE_BRANCH ..."
-            DEPLOY_URL=$(npx netlify deploy --site "$SITE_ID" --alias "$SAFE_BRANCH" --dir allure-report | grep -o 'https://[^ ]*')
-          fi
+          echo "🧪 Deploying preview Allure report for branch: $SAFE_BRANCH ..."
+          DEPLOY_URL=$(npx netlify deploy --site "$SITE_ID" --alias "$SAFE_BRANCH" --dir allure-report | grep -o 'https://[^ ]*')
 
           echo "✅ Allure report deployed at: $DEPLOY_URL"
 
@@ -103,7 +105,7 @@ jobs:
         if: success()
         run: |
           echo "🧪 Generating Cucumber HTML report..."
-          npx ts-node generateReport.ts
+          npm run report:bdd
           ls -R cucumber-html-report || echo "⚠️ Folder not found"
           echo "✅ Cucumber report generated."
 
@@ -116,7 +118,7 @@ jobs:
           publish_dir: ./cucumber-html-report
           destination_dir: cucumber-reports/${{ steps.sanitize.outputs.safe_branch }}
 
-      # 🪶 Log GitHub Pages report URL
+      # 🪶 Log deployed Cucumber report URL
       - name: Log deployed Cucumber report URL
         if: success()
         run: |
