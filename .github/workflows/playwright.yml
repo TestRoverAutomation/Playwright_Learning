@@ -37,6 +37,10 @@ jobs:
           node-version: lts/*
           cache: 'npm'
 
+      # inatall ts-node
+      - name: Install ts-node
+        run: npm install -g ts-node    
+
       # 📦 Install dependencies
       - name: Install dependencies
         run: npm ci
