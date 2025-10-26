@@ -11,7 +11,8 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "test": "npx bddgen && npx playwright test",
-    "allure-report": "allure generate allure-results --clean -o allure-report && allure open allure-report"
+    "allure-report": "allure generate allure-results --clean -o allure-report && allure open allure-report",
+    "report:bdd": "npx ts-node generateReport.ts"
   },
   "lint-staged": {
     "*.ts": [
@@ -45,12 +46,14 @@
     "husky": "^9.1.7",
     "jiti": "^2.6.0",
     "lint-staged": "^15.5.2",
+    "multiple-cucumber-html-reporter": "^3.9.3",
     "playwright-bdd": "^8.3.1",
     "prettier": "^3.6.2",
     "prettier-plugin-gherkin": "^3.1.2",
     "typescript-eslint": "^8.44.0"
   },
   "dependencies": {
+    "@cucumber/cucumber-json-converter": "^0.1.0",
     "netlify-cli": "^23.9.1"
   }
 }
