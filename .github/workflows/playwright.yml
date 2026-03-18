@@ -1,55 +1,77 @@
 name: Playwright Tests
 
+# 🧩 Trigger only for pull requests (no push runs)
 on:
-  push:
-    branches: [main, master]
   pull_request:
-    branches: [main, master]
-  # schedule:
-  #   - cron: '0 4 * * *' # Daily run at 04:00 AM UTC
+    branches:
+      - '**'
+
+# 🛡️ Permissions for GitHub Pages deploys + optional PR comments
+permissions:
+  contents: write          # required to push to gh-pages
+  pull-requests: write     # required to post PR comment URLs
+
+# 🚦 Prevent multiple concurrent runs on same branch
+concurrency:
+  group: playwright-tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
+    # ✅ Prevent duplicate push runs (safeguard)
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.56.1-noble
     timeout-minutes: 60
 
     steps:
+      # 🧾 Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 🧩 Node setup
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: 'npm'
 
+      # inatall ts-node
+      - name: Install ts-node
+        run: npm install -g ts-node    
+
+      # 📦 Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # 🌍 Install Playwright browsers
       - name: Install Playwright browsers
         run: npx playwright install --with-deps  
 
+      # 🧪 Run Playwright tests
       - name: Run Playwright tests
         run: npm run test
 
+      # ☕ Install Java (for Allure)
       - name: Install Java (for Allure)
         run: |
           apt-get update
           apt-get install -y openjdk-11-jre
 
+      # 🧰 Install Allure CLI
       - name: Install Allure CLI globally
         run: |
           npm install -g allure-commandline
           echo "$(npm root -g)/.bin" >> $GITHUB_PATH
           allure --version
 
+      # 🧾 Generate Allure report
       - name: Generate Allure report
         if: success() || failure()
         run: allure generate allure-results --clean -o allure-report
 
-      # ✅ Step to sanitize branch name once and reuse everywhere
+      # 🧮 Sanitize branch name for URLs
       - name: Sanitize branch name
         id: sanitize
         run: |
@@ -58,7 +80,7 @@ jobs:
           echo "Sanitized branch name: $SAFE_BRANCH"
           echo "safe_branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
 
-      # ✅ Upload Allure report artifact
+      # 💾 Upload Allure report artifact
       - name: Upload Allure report as artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -67,7 +89,7 @@ jobs:
           path: allure-report/
           retention-days: 30
 
-      # ✅ Deploy Allure report (prod for main/master, preview for branches)
+      # 🚀 Deploy Allure report to Netlify
       - name: Deploy Allure report to Netlify
         if: success()
         env:
@@ -75,28 +97,34 @@ jobs:
           SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
           SAFE_BRANCH="${{ steps.sanitize.outputs.safe_branch }}"
-          echo "Deploying for branch: $SAFE_BRANCH"
+          echo "Deploying Allure for branch: $SAFE_BRANCH"
 
-          if [ "$SAFE_BRANCH" = "main" ] || [ "$SAFE_BRANCH" = "master" ]; then
-            echo "🚀 Deploying production report for $SAFE_BRANCH ..."
-            npx netlify deploy \
-              --site "$SITE_ID" \
-              --prod \
-              --dir allure-report
-          else
-            echo "🧪 Deploying preview report for branch: $SAFE_BRANCH ..."
-            npx netlify deploy \
-              --site "$SITE_ID" \
-              --alias "$SAFE_BRANCH" \
-              --dir allure-report
-          fi
-           # ✅ Generate Cucumber HTML report  
-      -   name: Deploy Cucumber HTML report to GitHub Pages
-          if: success()
-          uses: peaceiris/actions-gh-pages@v4
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./cucumber-html-report
-            destination_dir: cucumber-reports/${{ steps.sanitize.outputs.safe_branch }}
-    
-    
+          echo "🧪 Deploying preview Allure report for branch: $SAFE_BRANCH ..."
+          DEPLOY_URL=$(npx netlify deploy --site "$SITE_ID" --alias "$SAFE_BRANCH" --dir allure-report | grep -o 'https://[^ ]*')
+
+          echo "✅ Allure report deployed at: $DEPLOY_URL"
+
+      # ✅ Generate Cucumber HTML report
+      - name: Generate Cucumber HTML report
+        if: success()
+        run: |
+          echo "🧪 Generating Cucumber HTML report..."
+          npm run report:bdd
+          ls -R cucumber-html-report || echo "⚠️ Folder not found"
+          echo "✅ Cucumber report generated."
+
+      # 🌐 Deploy Cucumber report to GitHub Pages
+      - name: Deploy Cucumber HTML report to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./cucumber-html-report
+          destination_dir: cucumber-reports/${{ steps.sanitize.outputs.safe_branch }}
+
+      # 🪶 Log deployed Cucumber report URL
+      - name: Log deployed Cucumber report URL
+        if: success()
+        run: |
+          echo "✅ Cucumber report deployed at:"
+          echo "https://testroverautomation.github.io/Playwright_Learning/cucumber-reports/${{ steps.sanitize.outputs.safe_branch }}/index.html"
