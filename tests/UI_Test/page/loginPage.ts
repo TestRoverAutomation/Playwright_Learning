@@ -12,11 +12,7 @@ export class LoginPage extends BasePage {
     this.my_account_Btn = page.getByRole('button', { name: 'My account' });
     this.email_box = page.getByPlaceholder('E-Mail Address');
     this.password_box = page.getByPlaceholder('Password');
-    this.submit_btn = page.locator("input[value='Login']");
-  }
-
-  async navigateToURL(url: string) {
-    await this.page.goto(url);
+    this.submit_btn = page.getByRole('button', { name: 'Login' });
   }
 
   async clickMYAccount() {

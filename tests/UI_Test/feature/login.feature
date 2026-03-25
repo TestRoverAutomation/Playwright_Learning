@@ -1,7 +1,5 @@
 @login
 Feature: Verify login
-  Feature Description
-
   Verify user is able to login with valid and invalid credentials
 
   Background: Navigate to eco login page
@@ -9,8 +7,7 @@ Feature: Verify login
 
   Scenario: Verify user is able to login with valid credentials
     And I click on My account
-    And I enter E-Mail Address "pranav@testroverautomation.com"
-    And I enter password "Test1234"
+    And I enter valid credentials
     When I click on submit button
     Then I should verify url contains "route=account/account"
 

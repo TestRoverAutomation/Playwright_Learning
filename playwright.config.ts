@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import { defineBddConfig, cucumberReporter } from 'playwright-bdd';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const testDir = defineBddConfig({
   features: 'tests/UI_Test/feature/***.feature',
